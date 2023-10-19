@@ -3,11 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TgClientSample", "TgClientSample\TgClientSample.csproj", "{F0901E32-3BEB-4A0C-9675-A336E3B416FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseService", "DatabaseService\DatabaseService.csproj", "{AF522835-57F8-49E2-A1A3-790D3CE90E06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Searcher", "Searcher\Searcher.csproj", "{D1E691A2-5507-4456-8696-EB4E2961ADDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DebugProject", "DebugProject\DebugProject.csproj", "{EEA728FA-CA80-4AA2-A954-38F701659178}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AF522835-57F8-49E2-A1A3-790D3CE90E06} = {AF522835-57F8-49E2-A1A3-790D3CE90E06}
+		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542} = {C2C3A7E2-E7E8-46CD-91C9-A1F696366542}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseService", "DatabaseService\DatabaseService.csproj", "{AF522835-57F8-49E2-A1A3-790D3CE90E06}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegremService", "TelegremService\TelegremService.csproj", "{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AF522835-57F8-49E2-A1A3-790D3CE90E06} = {AF522835-57F8-49E2-A1A3-790D3CE90E06}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,18 +22,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F0901E32-3BEB-4A0C-9675-A336E3B416FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F0901E32-3BEB-4A0C-9675-A336E3B416FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F0901E32-3BEB-4A0C-9675-A336E3B416FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F0901E32-3BEB-4A0C-9675-A336E3B416FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1E691A2-5507-4456-8696-EB4E2961ADDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1E691A2-5507-4456-8696-EB4E2961ADDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1E691A2-5507-4456-8696-EB4E2961ADDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1E691A2-5507-4456-8696-EB4E2961ADDD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AF522835-57F8-49E2-A1A3-790D3CE90E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AF522835-57F8-49E2-A1A3-790D3CE90E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF522835-57F8-49E2-A1A3-790D3CE90E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF522835-57F8-49E2-A1A3-790D3CE90E06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEA728FA-CA80-4AA2-A954-38F701659178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEA728FA-CA80-4AA2-A954-38F701659178}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEA728FA-CA80-4AA2-A954-38F701659178}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEA728FA-CA80-4AA2-A954-38F701659178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

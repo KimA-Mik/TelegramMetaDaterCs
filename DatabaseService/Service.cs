@@ -8,6 +8,8 @@ namespace DatabaseService
     {
         private readonly NpgsqlConnection _connection;
         private readonly SupergroupDao _supergroupDao;
+        private readonly MessageDao _messageDao;
+        private readonly WordDao _wordDao;
 
         public Service()
         {
@@ -20,11 +22,17 @@ namespace DatabaseService
             _connection = new NpgsqlConnection(connectionString);
             _connection.Open();
             _supergroupDao = new SupergroupDao(_connection);
+            _messageDao = new MessageDao(_connection);
+            _wordDao = new WordDao(_connection);
         }
 
-        public Task InsertSupergrup(Supergroup group) => _supergroupDao.Add(group);
-        public Task InsertSupergrups(IEnumerable<Supergroup> groups) => _supergroupDao.AddSeveral(groups);
+        public Task InsertSupergroup(Supergroup group) => _supergroupDao.Add(group);
+        public Task InsertSupergroups(IEnumerable<Supergroup> groups) => _supergroupDao.AddSeveral(groups);
         public Task<Supergroup?> GetSupergroupById(long id) => _supergroupDao.GetById(id);
+
+        public Task InsertMessage(Message message) => _messageDao.Add(message);
+        public Task InsertMessages(IEnumerable<Message> messages) => _messageDao.AddSeveral(messages);
+        public Task<Message?> GetMessageById(long id) => _messageDao.GetById(id);
 
         public void Dispose()
         {

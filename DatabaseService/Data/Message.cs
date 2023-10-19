@@ -2,8 +2,9 @@
 {
     public class Message
     {
-        public long id {  get; set; }
-        public long sender {  get; set; }
+        public int id { get; set; }
+        public int telegramId { get; set; }
+        public long sender { get; set; }
         public string content { get; set; }
     }
 }

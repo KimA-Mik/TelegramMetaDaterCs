@@ -1,4 +1,5 @@
-﻿using TgClientSample;
+﻿using TelegremService;
+
 
 //using var client = new WTelegram.Client(Config);
 //var myself = await client.LoginUserIfNeeded();

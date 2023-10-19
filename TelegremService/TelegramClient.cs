@@ -1,14 +1,17 @@
 ﻿using DatabaseService.Data;
 using TL;
 using WTelegram;
+using Message = DatabaseService.Data.Message;
 
-namespace TgClientSample
+namespace TelegremService
 {
     public class TelegramClient : IDisposable
     {
         private readonly string _phoneNuber;
         private readonly string _sessionFilePath;
         private readonly WTelegram.Client _client;
+        private readonly DatabaseService.Service _service = new DatabaseService.Service();
+
 
         private Dictionary<long, User> _users = new();
         private Dictionary<long, ChatBase> _chats = new();
@@ -16,7 +19,6 @@ namespace TgClientSample
 
         public TelegramClient(string phoneNumber, string sessionName)
         {
-
             _phoneNuber = phoneNumber;
             var sessionFileName = sessionName + ".session";
             var currentDirectory = Directory.GetCurrentDirectory();
@@ -41,11 +43,19 @@ namespace TgClientSample
             {
                 switch (await _client.Login(loginInfo))
                 {
-                    case "session_pathname": loginInfo = _sessionFilePath; break;
-                    case "verification_code": Console.Write("Code: "); loginInfo = Console.ReadLine(); break;
-                    default: loginInfo = null; break;                  // let WTelegramClient decide the default config
+                    case "session_pathname":
+                        loginInfo = _sessionFilePath;
+                        break;
+                    case "verification_code":
+                        Console.Write("Code: ");
+                        loginInfo = Console.ReadLine();
+                        break;
+                    default:
+                        loginInfo = null;
+                        break; // let WTelegramClient decide the default config
                 }
             }
+
             Console.WriteLine($"We are logged-in as {_client.User} (id {_client.User.id})");
         }
 
@@ -55,13 +65,15 @@ namespace TgClientSample
             long tprogerId = 1044298783;
 
             List<Supergroup> supergroups = new List<Supergroup>();
-            var chats = await _client.Messages_GetAllChats(); // chats = groups/channels (does not include users dialogs)
+            var chats = await _client
+                .Messages_GetAllChats(); // chats = groups/channels (does not include users dialogs)
             Console.WriteLine("This user has joined the following:");
             foreach (var (id, chat) in chats.chats)
                 switch (chat)
                 {
                     case Chat smallgroup when smallgroup.IsActive:
-                        Console.WriteLine($"{id}:  Small group: {smallgroup.title} with {smallgroup.participants_count} members");
+                        Console.WriteLine(
+                            $"{id}:  Small group: {smallgroup.title} with {smallgroup.participants_count} members");
                         break;
                     case Channel channel when channel.IsChannel:
                         Console.WriteLine($"{id}: Channel {channel.username}: {channel.title}");
@@ -85,26 +97,72 @@ namespace TgClientSample
             var dialogs = await _client.Messages_GetAllDialogs();
             dialogs.CollectUsersChats(_users, _chats);
 
-            //var tProger = _chats[tprogerId];
-            //var messages = await _client.Messages_GetHistory(tProger, 0);
-            //foreach (var msgBase in messages.Messages)
-            //{
-            //    Console.WriteLine("==============================");
-            //    var from = messages.UserOrChat(msgBase.From ?? msgBase.Peer); // from can be User/Chat/Channel
-            //    if (msgBase is Message msg)
-            //        Console.WriteLine($"{msg.ID} {from}> {msg.message} {msg.media}");
-            //    else if (msgBase is MessageService ms)
-            //        Console.WriteLine($"{from} [{ms.action.GetType().Name[13..]}]");
-            //}
+            var tProger = _chats[tprogerId];
 
-            var service = new DatabaseService.Service();
-            await service.InsertSupergrups(supergroups);
+            await _service.InsertSupergroups(supergroups);
+            await AddPeerMessagesToDb(tProger);
         }
 
         private async Task OnUpdate(UpdatesBase updates)
         {
             updates.CollectUsersChats(_users, _chats);
+        }
 
+        private async Task<IEnumerable<Message>> GetAllPeerMessages(InputPeer peer)
+        {
+            var result = new List<Message>();
+            for (int offsetId = 0;;)
+            {
+                var messages = await _client.Messages_GetHistory(peer, offsetId);
+                if (messages.Messages.Length == 0) break;
+                foreach (var msgBase in messages.Messages)
+                {
+                    var from = messages.UserOrChat(msgBase.From ?? msgBase.Peer); // from can be User/Chat/Channel
+                    if (msgBase is TL.Message msg)
+                    {
+                        result.Add(new Message
+                        {
+                            id = 0,
+                            telegramId = msg.id,
+                            sender = peer.ID,
+                            content = msg.message
+                        });
+                    }
+                }
+
+                offsetId = messages.Messages[^1].ID;
+            }
+
+            return result;
+        }
+
+        private async Task AddPeerMessagesToDb(InputPeer peer)
+        {
+            var result = new List<Message>();
+            for (int offsetId = 0; ;)
+            {
+                var messages = await _client.Messages_GetHistory(peer, offsetId);
+                if (messages.Messages.Length == 0) break;
+                foreach (var msgBase in messages.Messages)
+                {
+                    var from = messages.UserOrChat(msgBase.From ?? msgBase.Peer); // from can be User/Chat/Channel
+                    if (msgBase is TL.Message msg)
+                    {
+                        result.Add(new Message
+                        {
+                            id = 0,
+                            telegramId = msg.id,
+                            sender = peer.ID,
+                            content = msg.message
+                        });
+                    }
+                }
+
+                offsetId = messages.Messages[^1].ID;
+                await _service.InsertMessages(result);
+                result.Clear();
+                await Task.Delay(Random.Shared.Next(100, 2000));
+            }
         }
 
 
@@ -115,6 +173,7 @@ namespace TgClientSample
             {
                 throw new Exception("No api id is provided");
             }
+
             if (!int.TryParse(api_id_str, out api_id))
             {
                 throw new Exception("Incorrect api id is provided");
@@ -125,6 +184,7 @@ namespace TgClientSample
             {
                 throw new Exception("No api hash is provided");
             }
+
             api_hash = api_hash_str;
         }
     }
