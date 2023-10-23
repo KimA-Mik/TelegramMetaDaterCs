@@ -7,6 +7,8 @@ namespace DatabaseService
     public class Service : IDisposable
     {
         private readonly NpgsqlConnection _connection;
+
+        private readonly WordsMessagesDao _wordsMessagesDao;
         private readonly SupergroupDao _supergroupDao;
         private readonly MessageDao _messageDao;
         private readonly WordDao _wordDao;
@@ -21,6 +23,8 @@ namespace DatabaseService
 
             _connection = new NpgsqlConnection(connectionString);
             _connection.Open();
+
+            _wordsMessagesDao = new WordsMessagesDao(_connection);
             _supergroupDao = new SupergroupDao(_connection);
             _messageDao = new MessageDao(_connection);
             _wordDao = new WordDao(_connection);
@@ -38,6 +42,13 @@ namespace DatabaseService
         public Task InsertWors(IEnumerable<string> words) => _wordDao.AddSeveral(words);
         public Task<Word?> GetWordById(int id) => _wordDao.GetById(id);
         public Task<Word?> GetWordByWord(string word) => _wordDao.GetByWord(word);
+
+        public Task InsertWordMessage(WordMessage wm) => _wordsMessagesDao.Add(wm);
+        public Task InsertWordMessages(IEnumerable<WordMessage> wms) => _wordsMessagesDao.AddSeveral(wms);
+        public Task<WordMessage?> GetWordMessageById(int id) => _wordsMessagesDao.GetById(id);
+        public Task<IEnumerable<WordMessage>> GetWmsForWord(int wordId) => _wordsMessagesDao.GetByWordId(wordId);
+        public Task<IEnumerable<WordMessage>> GetWmsForMessage(long messageId) => _wordsMessagesDao.GetByMessageId(messageId);
+
 
         public void Dispose()
         {

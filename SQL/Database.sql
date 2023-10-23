@@ -24,11 +24,11 @@ CREATE TABLE Words (
 CREATE UNIQUE INDEX Words_Word ON Words (Word);
 
 
-CREATE TABLE Word_Messages(
+CREATE TABLE Words_Messages(
 	Id SERIAL PRIMARY KEY,
 	Message_Id BIGINT REFERENCES Messages(Id),
 	Word_Id INT REFERENCES Words(Id),
 	count INT
 );
-CREATE INDEX WordMessages_WordId ON Word_Messages (Word_Id);
-CREATE UNIQUE INDEX WordMessages_WordId_MessageId ON Word_Messages (Message_Id, Word_Id);
+CREATE INDEX WordMessages_WordId ON Words_Messages (Word_Id);
+CREATE UNIQUE INDEX WordMessages_WordId_MessageId ON Words_Messages (Message_Id, Word_Id);
