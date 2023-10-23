@@ -34,10 +34,14 @@ namespace DatabaseService
         public Task InsertMessages(IEnumerable<Message> messages) => _messageDao.AddSeveral(messages);
         public Task<Message?> GetMessageById(long id) => _messageDao.GetById(id);
 
+        public Task InsertWord(string word) => _wordDao.Add(word);
+        public Task InsertWors(IEnumerable<string> words) => _wordDao.AddSeveral(words);
+        public Task<Word?> GetWordById(int id) => _wordDao.GetById(id);
+        public Task<Word?> GetWordByWord(string word) => _wordDao.GetByWord(word);
+
         public void Dispose()
         {
             _connection.Close();
         }
-
     }
 }

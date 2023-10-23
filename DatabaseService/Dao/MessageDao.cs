@@ -52,7 +52,7 @@ public class MessageDao
         string commandText = $"SELECT * FROM {TableName} WHERE Id = @id";
         await using var cmd = new NpgsqlCommand(commandText, _connection);
         cmd.Parameters.AddWithValue("id", id);
-        await using var reader = await cmd.ExecuteReaderAsync();
+        using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
             Message message = ReadMessage(reader);
@@ -68,7 +68,7 @@ public class MessageDao
         await using var cmd = new NpgsqlCommand(commandText, _connection);
         cmd.Parameters.AddWithValue("sender", sender);
         cmd.Parameters.AddWithValue("telegram_id", telegramId);
-        await using var reader = await cmd.ExecuteReaderAsync();
+        using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
             Message message = ReadMessage(reader);
@@ -90,7 +90,7 @@ public class MessageDao
             readContent == null ||
             readTelegramId == null)
         {
-            throw new Exception("Could not read supergroup");
+            throw new Exception("Could not read message");
         }
 
         Message message = new Message()
