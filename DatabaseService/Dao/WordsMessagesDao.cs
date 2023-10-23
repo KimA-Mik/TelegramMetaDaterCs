@@ -15,7 +15,7 @@ namespace DatabaseService.Dao
 
         public async Task Add(WordMessage wm)
         {
-            string commandText =
+            const string commandText =
                 $"INSERT INTO {TableName} (message_id, word_id, count) VALUES (@message_id, @word_id, @count)" +
                 "ON CONFLICT (message_id, word_id) DO UPDATE\n" +
                 "SET count = excluded.count";
@@ -30,7 +30,7 @@ namespace DatabaseService.Dao
         public async Task AddSeveral(IEnumerable<WordMessage> wms)
         {
             var trans = await _connection.BeginTransactionAsync();
-            string commandText =
+            const string commandText =
                 $"INSERT INTO {TableName} (message_id, word_id, count) VALUES (@message_id, @word_id, @count)" +
                 "ON CONFLICT (message_id, word_id) DO UPDATE\n" +
                 "SET count = excluded.count";
@@ -49,57 +49,60 @@ namespace DatabaseService.Dao
 
         public async Task<WordMessage?> GetById(int id)
         {
-            string commandText = $"SELECT * FROM {TableName} WHERE Id = @id";
+            const string commandText = $"SELECT * FROM {TableName} WHERE Id = @id";
             await using var cmd = new NpgsqlCommand(commandText, _connection);
             cmd.Parameters.AddWithValue("id", id);
-            using var reader = await cmd.ExecuteReaderAsync();
+            await using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
                 var wm = ReadWordMessage(reader);
                 return wm;
             }
+
             return null;
         }
 
         public async Task<IEnumerable<WordMessage>> GetByMessageId(long messageId)
         {
             var result = new List<WordMessage>();
-            string commandText = $"SELECT * FROM {TableName} WHERE message_id = @message_id";
+            const string commandText = $"SELECT * FROM {TableName} WHERE message_id = @message_id";
             await using var cmd = new NpgsqlCommand(commandText, _connection);
             cmd.Parameters.AddWithValue("message_id", messageId);
-            using var reader = await cmd.ExecuteReaderAsync();
+            await using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
                 var wm = ReadWordMessage(reader);
                 result.Add(wm);
             }
+
             return result;
         }
 
         public async Task<IEnumerable<WordMessage>> GetByWordId(int wordId)
         {
             var result = new List<WordMessage>();
-            string commandText = $"SELECT * FROM {TableName} WHERE message_id = @message_id";
+            const string commandText = $"SELECT * FROM {TableName} WHERE message_id = @message_id";
             await using var cmd = new NpgsqlCommand(commandText, _connection);
             cmd.Parameters.AddWithValue("word_id", wordId);
-            using var reader = await cmd.ExecuteReaderAsync();
+            await using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
             {
                 var wm = ReadWordMessage(reader);
                 result.Add(wm);
             }
+
             return result;
         }
 
         private static WordMessage ReadWordMessage(NpgsqlDataReader reader)
         {
-            int? readId = reader["Id"] as int?;
-            long? readMessageId = reader["message_id"] as long?;
-            int? readWordId = reader["word_id"] as int?;
-            int? readCount = reader["count"] as int?;
+            var readId = reader["Id"] as int?;
+            var readMessageId = reader["message_id"] as long?;
+            var readWordId = reader["word_id"] as int?;
+            var readCount = reader["count"] as int?;
 
             if (readId == null ||
                 readCount == null ||
@@ -109,7 +112,7 @@ namespace DatabaseService.Dao
                 throw new Exception("Could not read WordMessage");
             }
 
-            WordMessage message = new WordMessage()
+            var message = new WordMessage()
             {
                 id = readId.Value,
                 messageId = readMessageId.Value,

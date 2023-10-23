@@ -15,7 +15,7 @@ public class MessageDao
 
     public async Task Add(Message message)
     {
-        string commandText =
+        const string commandText =
             $"INSERT INTO {TableName} (telegram_id, sender, content) VALUES (@telegram_id, @sender, @content)" +
             "ON CONFLICT (telegram_id, sender) DO UPDATE\n" +
             "SET content = excluded.content";
@@ -30,7 +30,7 @@ public class MessageDao
     public async Task AddSeveral(IEnumerable<Message> messages)
     {
         var trans = await _connection.BeginTransactionAsync();
-        string commandText =
+        const string commandText =
             $"INSERT INTO {TableName} (telegram_id, sender, content) VALUES (@telegram_id, @sender, @content)" +
             "ON CONFLICT (telegram_id, sender) DO UPDATE\n" +
             "SET content = excluded.content";
@@ -49,13 +49,13 @@ public class MessageDao
 
     public async Task<Message?> GetById(long id)
     {
-        string commandText = $"SELECT * FROM {TableName} WHERE Id = @id";
+        const string commandText = $"SELECT * FROM {TableName} WHERE Id = @id";
         await using var cmd = new NpgsqlCommand(commandText, _connection);
         cmd.Parameters.AddWithValue("id", id);
-        using var reader = await cmd.ExecuteReaderAsync();
+        await using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            Message message = ReadMessage(reader);
+            var message = ReadMessage(reader);
             return message;
         }
 
@@ -64,14 +64,14 @@ public class MessageDao
 
     public async Task<int> GetdBySenderAndTelegramId(long sender, int telegramId)
     {
-        string commandText = $"SELECT * FROM {TableName} WHERE sender = @sender AND telegram_id = @telegram_id";
+        const string commandText = $"SELECT * FROM {TableName} WHERE sender = @sender AND telegram_id = @telegram_id";
         await using var cmd = new NpgsqlCommand(commandText, _connection);
         cmd.Parameters.AddWithValue("sender", sender);
         cmd.Parameters.AddWithValue("telegram_id", telegramId);
-        using var reader = await cmd.ExecuteReaderAsync();
+        await using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            Message message = ReadMessage(reader);
+            var message = ReadMessage(reader);
             return message.id;
         }
 
@@ -80,10 +80,10 @@ public class MessageDao
 
     private static Message ReadMessage(NpgsqlDataReader reader)
     {
-        int? readId = reader["Id"] as int?;
-        int? readTelegramId = reader["telegram_id"] as int?;
-        long? readSender = reader["Title"] as long?;
-        string? readContent = reader["MainUsername"] as string;
+        var readId = reader["Id"] as int?;
+        var readTelegramId = reader["telegram_id"] as int?;
+        var readSender = reader["Title"] as long?;
+        var readContent = reader["MainUsername"] as string;
 
         if (readId == null ||
             readSender == null ||
@@ -93,7 +93,7 @@ public class MessageDao
             throw new Exception("Could not read message");
         }
 
-        Message message = new Message()
+        var message = new Message()
         {
             id = readId.Value,
             telegramId = readTelegramId.Value,
