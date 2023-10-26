@@ -1,4 +1,5 @@
 ﻿using DatabaseService.Data;
+using TelegremService.Index;
 using TL;
 using WTelegram;
 using Message = DatabaseService.Data.Message;
@@ -11,6 +12,7 @@ namespace TelegremService
         private readonly string _sessionFilePath;
         private readonly WTelegram.Client _client;
         private readonly DatabaseService.Service _service = new DatabaseService.Service();
+        private readonly Indexer _indexer;
 
 
         private Dictionary<long, User> _users = new();
@@ -29,6 +31,7 @@ namespace TelegremService
             LoadEvrironmentVariables(out var apiId, out var apiHash);
 
             _client = new WTelegram.Client(apiId, apiHash);
+            _indexer = new Indexer(_service);
         }
 
         public void Dispose()
@@ -62,8 +65,6 @@ namespace TelegremService
 
         public async Task RunSth()
         {
-            long tprogerId = 1044298783;
-
             List<Supergroup> supergroups = new List<Supergroup>();
             var chats = await _client
                 .Messages_GetAllChats(); // chats = groups/channels (does not include users dialogs)
@@ -97,6 +98,7 @@ namespace TelegremService
             var dialogs = await _client.Messages_GetAllDialogs();
             dialogs.CollectUsersChats(_users, _chats);
 
+            long tprogerId = 1044298783;
             var tProger = _chats[tprogerId];
 
             await _service.InsertSupergroups(supergroups);
@@ -136,10 +138,23 @@ namespace TelegremService
             return result;
         }
 
+        //TODO: Extract indexing from client
+        private async Task IndexMessage(long sender, int telegramId)
+        {
+            var message = await _service.GetMessageBySenderAndTelegramId(sender, telegramId);
+            if (message == null)
+            {
+                return;
+            }
+
+            var index = _indexer.IndexMessage(message);
+            await _indexer.LoadIndexIntoDb(message.id, index);
+        }
+
         private async Task AddPeerMessagesToDb(InputPeer peer)
         {
             var result = new List<Message>();
-            for (int offsetId = 0; ;)
+            for (int offsetId = 0;;)
             {
                 var messages = await _client.Messages_GetHistory(peer, offsetId);
                 if (messages.Messages.Length == 0) break;
@@ -160,6 +175,10 @@ namespace TelegremService
 
                 offsetId = messages.Messages[^1].ID;
                 await _service.InsertMessages(result);
+                foreach (var message in result)
+                {
+                    await IndexMessage(message.sender, message.telegramId);
+                }
                 result.Clear();
                 await Task.Delay(Random.Shared.Next(100, 2000));
             }

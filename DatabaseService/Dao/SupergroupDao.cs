@@ -36,15 +36,10 @@ namespace DatabaseService.Dao
 
             foreach (var group in groups)
             {
-                if (group.mainUsername == null)
-                {
-                    continue;
-                }
-
                 await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
                 cmd.Parameters.AddWithValue("id", group.id);
                 cmd.Parameters.AddWithValue("title", group.title);
-                cmd.Parameters.AddWithValue("mainUsername", group.mainUsername);
+                cmd.Parameters.AddWithValue("mainUsername", group.mainUsername?? "");
                 await cmd.ExecuteNonQueryAsync();
             }
 

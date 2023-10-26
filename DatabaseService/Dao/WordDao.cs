@@ -25,9 +25,10 @@ namespace DatabaseService.Dao
         public async Task AddSeveral(IEnumerable<string> words)
         {
             var trans = await _connection.BeginTransactionAsync();
-            const string commandText = $"INSERT INTO {TableName} (word) VALUES (@word)" +
-                                       "ON CONFLICT (word) DO UPDATE\n" +
-                                       "SET word = excluded.word";
+            const string commandText = """
+                                       INSERT INTO words (word) VALUES (@word)
+                                       ON CONFLICT (word) DO NOTHING
+                                       """;
             foreach (var word in words)
             {
                 await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
@@ -56,9 +57,10 @@ namespace DatabaseService.Dao
 
         public async Task<Word?> GetByWord(string word)
         {
-            const string commandText = $"SELECT * FROM {TableName} WHERE word = @word";
+            const string commandText = "SELECT * FROM words WHERE word = @word";
             await using var cmd = new NpgsqlCommand(commandText, _connection);
             cmd.Parameters.AddWithValue("word", word);
+            cmd.CommandText = commandText;
             await using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
@@ -74,7 +76,7 @@ namespace DatabaseService.Dao
         private static Word ReadWord(NpgsqlDataReader reader)
         {
             var readId = reader["Id"] as int?;
-            var readContent = reader["MainUsername"] as string;
+            var readContent = reader["word"] as string;
 
             if (readId == null ||
                 readContent == null)

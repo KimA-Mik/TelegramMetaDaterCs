@@ -62,7 +62,7 @@ public class MessageDao
         return null;
     }
 
-    public async Task<int> GetdBySenderAndTelegramId(long sender, int telegramId)
+    public async Task<Message?> GetBySenderAndTelegramId(long sender, int telegramId)
     {
         const string commandText = $"SELECT * FROM {TableName} WHERE sender = @sender AND telegram_id = @telegram_id";
         await using var cmd = new NpgsqlCommand(commandText, _connection);
@@ -72,18 +72,18 @@ public class MessageDao
         while (await reader.ReadAsync())
         {
             var message = ReadMessage(reader);
-            return message.id;
+            return message;
         }
 
-        return -1;
+        return null;
     }
 
     private static Message ReadMessage(NpgsqlDataReader reader)
     {
         var readId = reader["Id"] as int?;
         var readTelegramId = reader["telegram_id"] as int?;
-        var readSender = reader["Title"] as long?;
-        var readContent = reader["MainUsername"] as string;
+        var readSender = reader["sender"] as long?;
+        var readContent = reader["content"] as string;
 
         if (readId == null ||
             readSender == null ||

@@ -37,6 +37,8 @@ namespace DatabaseService
         public Task InsertMessage(Message message) => _messageDao.Add(message);
         public Task InsertMessages(IEnumerable<Message> messages) => _messageDao.AddSeveral(messages);
         public Task<Message?> GetMessageById(long id) => _messageDao.GetById(id);
+        public Task<Message?> GetMessageBySenderAndTelegramId(long sender, int telegramId) =>
+            _messageDao.GetBySenderAndTelegramId(sender, telegramId);
 
         public Task InsertWord(string word) => _wordDao.Add(word);
         public Task InsertWors(IEnumerable<string> words) => _wordDao.AddSeveral(words);
@@ -47,7 +49,9 @@ namespace DatabaseService
         public Task InsertWordMessages(IEnumerable<WordMessage> wms) => _wordsMessagesDao.AddSeveral(wms);
         public Task<WordMessage?> GetWordMessageById(int id) => _wordsMessagesDao.GetById(id);
         public Task<IEnumerable<WordMessage>> GetWmsForWord(int wordId) => _wordsMessagesDao.GetByWordId(wordId);
-        public Task<IEnumerable<WordMessage>> GetWmsForMessage(long messageId) => _wordsMessagesDao.GetByMessageId(messageId);
+
+        public Task<IEnumerable<WordMessage>> GetWmsForMessage(long messageId) =>
+            _wordsMessagesDao.GetByMessageId(messageId);
 
 
         public void Dispose()

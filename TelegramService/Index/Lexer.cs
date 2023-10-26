@@ -11,20 +11,18 @@ namespace TelegremService
         public IEnumerable<string> Tokenize(string text)
         {
             text = text.ToLower();
-            var start = -1;
             for (var i = 0; i < text.Length; ++i)
             {
-                if (Char.IsLetter(text[i]))
+                if (!Char.IsLetter(text[i])) continue;
+                var start = i++;
+                while (i < text.Length &&
+                       (Char.IsLetterOrDigit(text[i]) ||
+                        text[i] == '-'))
                 {
-                    start = i++;
-                    while ((Char.IsLetterOrDigit(text[i]) ||
-                        text[i] == '-') && i < text.Length)
-                    {
-                        i++;
-                    }
-                    yield return text.Substring(start, i - start);
-
+                    i++;
                 }
+
+                yield return text.Substring(start, i - start);
             }
         }
     }

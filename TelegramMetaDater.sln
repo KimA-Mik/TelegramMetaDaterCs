@@ -11,10 +11,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DebugProject", "DebugProjec
 		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542} = {C2C3A7E2-E7E8-46CD-91C9-A1F696366542}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegremService", "TelegremService\TelegremService.csproj", "{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramService", "TelegramService\TelegramService.csproj", "{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}"
 	ProjectSection(ProjectDependencies) = postProject
 		{AF522835-57F8-49E2-A1A3-790D3CE90E06} = {AF522835-57F8-49E2-A1A3-790D3CE90E06}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseDebugProject", "DatabaseDebugProject\DatabaseDebugProject.csproj", "{B598D77B-A3DB-4644-AFA9-B530EA50E28C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +36,10 @@ Global
 		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B598D77B-A3DB-4644-AFA9-B530EA50E28C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B598D77B-A3DB-4644-AFA9-B530EA50E28C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B598D77B-A3DB-4644-AFA9-B530EA50E28C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B598D77B-A3DB-4644-AFA9-B530EA50E28C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
