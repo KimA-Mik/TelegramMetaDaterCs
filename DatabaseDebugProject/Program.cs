@@ -15,7 +15,7 @@ string[] words = { "модуль", "пакет", "python" };
 var list = await service.GetMessagesWithWords(words);
 foreach (var message in list)
 {
-    Console.WriteLine(message.content);
+    Console.WriteLine(message.Content);
 }
 
 

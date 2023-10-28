@@ -18,9 +18,9 @@ namespace DatabaseService.Dao
             const string commandText =
                 $"INSERT INTO {TableName} (id, title, main_username) VALUES (@id, @title, @mainUsername)";
             await using var cmd = new NpgsqlCommand(commandText, _connection);
-            cmd.Parameters.AddWithValue("id", group.id);
-            cmd.Parameters.AddWithValue("title", group.title);
-            cmd.Parameters.AddWithValue("mainUsername", group.mainUsername);
+            cmd.Parameters.AddWithValue("id", group.Id);
+            cmd.Parameters.AddWithValue("title", group.Title);
+            cmd.Parameters.AddWithValue("mainUsername", group.MainUsername);
 
             await cmd.ExecuteNonQueryAsync();
         }
@@ -37,9 +37,9 @@ namespace DatabaseService.Dao
             foreach (var group in groups)
             {
                 await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
-                cmd.Parameters.AddWithValue("id", group.id);
-                cmd.Parameters.AddWithValue("title", group.title);
-                cmd.Parameters.AddWithValue("mainUsername", group.mainUsername?? "");
+                cmd.Parameters.AddWithValue("id", group.Id);
+                cmd.Parameters.AddWithValue("title", group.Title);
+                cmd.Parameters.AddWithValue("mainUsername", group.MainUsername ?? "");
                 await cmd.ExecuteNonQueryAsync();
             }
 
@@ -77,9 +77,9 @@ namespace DatabaseService.Dao
 
             var group = new Supergroup
             {
-                id = readId.Value,
-                title = readTitle,
-                mainUsername = readMainUsername
+                Id = readId.Value,
+                Title = readTitle,
+                MainUsername = readMainUsername
             };
             return group;
         }

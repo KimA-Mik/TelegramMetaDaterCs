@@ -16,7 +16,7 @@ public class Indexer
     public MessageIndex IndexMessage(Message message)
     {
         var words = 0;
-        var tfIndex = IndexTf(message.content, out words);
+        var tfIndex = IndexTf(message.Content, out words);
 
         return new MessageIndex()
         {
@@ -37,10 +37,10 @@ public class Indexer
             var wordEntity = await _service.GetWordByWord(word);
             wms.Add(new WordMessage
             {
-                id = 0,
-                messageId = messageId,
-                count = index.tfIndex[word],
-                wordId = wordEntity!.id
+                Id = 0,
+                MessageId = messageId,
+                Count = index.tfIndex[word],
+                WordId = wordEntity!.Id
             });
         }
 

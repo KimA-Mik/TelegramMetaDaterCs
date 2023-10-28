@@ -20,9 +20,9 @@ namespace DatabaseService.Dao
                 "ON CONFLICT (message_id, word_id) DO UPDATE\n" +
                 "SET count = excluded.count";
             await using var cmd = new NpgsqlCommand(commandText, _connection);
-            cmd.Parameters.AddWithValue("message_id", wm.messageId);
-            cmd.Parameters.AddWithValue("word_id", wm.wordId);
-            cmd.Parameters.AddWithValue("count", wm.count);
+            cmd.Parameters.AddWithValue("message_id", wm.MessageId);
+            cmd.Parameters.AddWithValue("word_id", wm.WordId);
+            cmd.Parameters.AddWithValue("count", wm.Count);
 
             await cmd.ExecuteNonQueryAsync();
         }
@@ -37,9 +37,9 @@ namespace DatabaseService.Dao
             foreach (var wm in wms)
             {
                 await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
-                cmd.Parameters.AddWithValue("message_id", wm.messageId);
-                cmd.Parameters.AddWithValue("word_id", wm.wordId);
-                cmd.Parameters.AddWithValue("count", wm.count);
+                cmd.Parameters.AddWithValue("message_id", wm.MessageId);
+                cmd.Parameters.AddWithValue("word_id", wm.WordId);
+                cmd.Parameters.AddWithValue("count", wm.Count);
 
                 await cmd.ExecuteNonQueryAsync();
             }
@@ -114,10 +114,10 @@ namespace DatabaseService.Dao
 
             var message = new WordMessage()
             {
-                id = readId.Value,
-                messageId = readMessageId.Value,
-                wordId = readWordId.Value,
-                count = readCount.Value
+                Id = readId.Value,
+                MessageId = readMessageId.Value,
+                WordId = readWordId.Value,
+                Count = readCount.Value
             };
             return message;
         }

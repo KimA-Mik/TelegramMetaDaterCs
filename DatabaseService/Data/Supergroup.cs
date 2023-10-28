@@ -2,8 +2,8 @@
 {
     public class Supergroup
     {
-        public long id { get; set; }
-        public string title { get; set; }
-        public string mainUsername { get; set; }
+        public long Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string MainUsername { get; set; } = string.Empty;
     }
 }

@@ -2,7 +2,7 @@
 {
     public class Word
     {
-        public int id { get; set; }
-        public string word { get; set; }
+        public int Id { get; set; }
+        public string Text { get; set; } = string.Empty;
     }
 }

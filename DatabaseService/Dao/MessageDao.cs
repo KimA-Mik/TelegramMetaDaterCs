@@ -22,9 +22,9 @@ public class MessageDao
             "ON CONFLICT (telegram_id, sender) DO UPDATE\n" +
             "SET content = excluded.content";
         await using var cmd = new NpgsqlCommand(commandText, _connection);
-        cmd.Parameters.AddWithValue("telegram_id", message.telegramId);
-        cmd.Parameters.AddWithValue("sender", message.sender);
-        cmd.Parameters.AddWithValue("content", message.content);
+        cmd.Parameters.AddWithValue("telegram_id", message.TelegramId);
+        cmd.Parameters.AddWithValue("sender", message.Sender);
+        cmd.Parameters.AddWithValue("content", message.Content);
 
         await cmd.ExecuteNonQueryAsync();
     }
@@ -39,9 +39,9 @@ public class MessageDao
         foreach (var message in messages)
         {
             await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
-            cmd.Parameters.AddWithValue("telegram_id", message.telegramId);
-            cmd.Parameters.AddWithValue("sender", message.sender);
-            cmd.Parameters.AddWithValue("content", message.content);
+            cmd.Parameters.AddWithValue("telegram_id", message.TelegramId);
+            cmd.Parameters.AddWithValue("sender", message.Sender);
+            cmd.Parameters.AddWithValue("content", message.Content);
 
             await cmd.ExecuteNonQueryAsync();
         }
@@ -131,9 +131,9 @@ public class MessageDao
     private static Message ReadMessage(NpgsqlDataReader reader)
     {
         var readId = reader["Id"] as int?;
-        var readTelegramId = reader["telegram_id"] as int?;
         var readSender = reader["sender"] as long?;
         var readContent = reader["content"] as string;
+        var readTelegramId = reader["telegram_id"] as int?;
 
         if (readId == null ||
             readSender == null ||
@@ -145,10 +145,10 @@ public class MessageDao
 
         var message = new Message()
         {
-            id = readId.Value,
-            telegramId = readTelegramId.Value,
-            sender = readSender.Value,
-            content = readContent
+            Id = readId.Value,
+            TelegramId = readTelegramId.Value,
+            Sender = readSender.Value,
+            Content = readContent,
         };
         return message;
     }

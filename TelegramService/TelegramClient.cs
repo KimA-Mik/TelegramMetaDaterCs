@@ -83,9 +83,9 @@ namespace TelegremService
                         supergroups.Add(
                             new Supergroup
                             {
-                                id = channel.id,
-                                title = channel.title,
-                                mainUsername = channel.MainUsername,
+                                Id = channel.id,
+                                Title = channel.title,
+                                MainUsername = channel.MainUsername,
                             });
                         break;
                     case Channel group: // no broadcast flag => it's a big group, also called supergroup or megagroup
@@ -124,10 +124,10 @@ namespace TelegremService
                     {
                         result.Add(new Message
                         {
-                            id = 0,
-                            telegramId = msg.id,
-                            sender = peer.ID,
-                            content = msg.message
+                            Id = 0,
+                            TelegramId = msg.id,
+                            Sender = peer.ID,
+                            Content = msg.message
                         });
                     }
                 }
@@ -148,7 +148,7 @@ namespace TelegremService
             }
 
             var index = _indexer.IndexMessage(message);
-            await _indexer.LoadIndexIntoDb(message.id, index);
+            await _indexer.LoadIndexIntoDb(message.Id, index);
         }
 
         private async Task AddPeerMessagesToDb(InputPeer peer)
@@ -165,10 +165,10 @@ namespace TelegremService
                     {
                         result.Add(new Message
                         {
-                            id = 0,
-                            telegramId = msg.id,
-                            sender = peer.ID,
-                            content = msg.message
+                            Id = 0,
+                            TelegramId = msg.id,
+                            Sender = peer.ID,
+                            Content = msg.message
                         });
                     }
                 }
@@ -177,8 +177,9 @@ namespace TelegremService
                 await _service.InsertMessages(result);
                 foreach (var message in result)
                 {
-                    await IndexMessage(message.sender, message.telegramId);
+                    await IndexMessage(message.Sender, message.TelegramId);
                 }
+
                 result.Clear();
                 await Task.Delay(Random.Shared.Next(100, 2000));
             }

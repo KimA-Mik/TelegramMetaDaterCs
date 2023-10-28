@@ -2,9 +2,9 @@
 {
     public class WordMessage
     {
-        public int id { get; set; }
-        public long messageId { get; set; }
-        public int wordId { get; set; }
-        public int count { get; set; }
+        public int Id { get; set; }
+        public long MessageId { get; set; }
+        public int WordId { get; set; }
+        public int Count { get; set; }
     }
 }

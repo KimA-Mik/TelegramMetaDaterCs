@@ -2,9 +2,9 @@
 {
     public class Message
     {
-        public int id { get; set; }
-        public int telegramId { get; set; }
-        public long sender { get; set; }
-        public string content { get; set; }
+        public int Id { get; set; }
+        public int TelegramId { get; set; }
+        public long Sender { get; set; }
+        public string Content { get; set; } = string.Empty;
     }
 }
