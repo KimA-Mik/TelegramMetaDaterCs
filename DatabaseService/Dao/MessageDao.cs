@@ -1,5 +1,7 @@
-﻿using DatabaseService.Data;
+﻿using System.Text;
+using DatabaseService.Data;
 using Npgsql;
+using NpgsqlTypes;
 
 namespace DatabaseService.Dao;
 
@@ -76,6 +78,54 @@ public class MessageDao
         }
 
         return null;
+    }
+
+    public async Task<IList<Message>> GetContainingWords(IEnumerable<string> words)
+    {
+        var result = new List<Message>();
+        const string commandTextTemplate = """
+                                           SELECT *
+                                           FROM messages
+                                           WHERE id IN (
+                                               SELECT message_id
+                                               FROM words_messages
+                                               WHERE word_id IN (
+                                                   SELECT id
+                                                   FROM words
+                                                   WHERE words.word in  (
+                                           """;
+        var sb = new StringBuilder(commandTextTemplate);
+        var parameters = new List<NpgsqlParameter>();
+        int i = 0;
+        foreach (var word in words)
+        {
+            var pName = $"p{i}";
+            var p = new NpgsqlParameter(pName, NpgsqlDbType.Varchar);
+            p.Value = word;
+            parameters.Add(p);
+
+            sb.Append(':');
+            sb.Append(pName);
+            sb.Append(", ");
+
+            i++;
+        }
+
+        sb[^2] = ')';
+        sb[^1] = ')';
+        sb.Append(')');
+        var commandText = sb.ToString();
+
+        await using var cmd = new NpgsqlCommand(commandText, _connection);
+        cmd.Parameters.AddRange(parameters.ToArray());
+
+        await using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            result.Add(ReadMessage(reader));
+        }
+
+        return result;
     }
 
     private static Message ReadMessage(NpgsqlDataReader reader)

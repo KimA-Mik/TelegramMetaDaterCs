@@ -37,8 +37,12 @@ namespace DatabaseService
         public Task InsertMessage(Message message) => _messageDao.Add(message);
         public Task InsertMessages(IEnumerable<Message> messages) => _messageDao.AddSeveral(messages);
         public Task<Message?> GetMessageById(long id) => _messageDao.GetById(id);
+
         public Task<Message?> GetMessageBySenderAndTelegramId(long sender, int telegramId) =>
             _messageDao.GetBySenderAndTelegramId(sender, telegramId);
+
+        public Task<IList<Message>> GetMessagesWithWords(IList<string> words) =>
+            _messageDao.GetContainingWords(words);
 
         public Task InsertWord(string word) => _wordDao.Add(word);
         public Task InsertWors(IEnumerable<string> words) => _wordDao.AddSeveral(words);

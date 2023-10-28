@@ -12,10 +12,10 @@ var startTime = DateTime.Now;
 
 string[] words = { "модуль", "пакет", "python" };
 
-var list = await service.GetWordsByStrings(words);
-foreach (var word in list)
+var list = await service.GetMessagesWithWords(words);
+foreach (var message in list)
 {
-    Console.WriteLine(word.word);
+    Console.WriteLine(message.content);
 }
 
 
