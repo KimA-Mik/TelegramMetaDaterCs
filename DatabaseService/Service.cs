@@ -44,11 +44,12 @@ namespace DatabaseService
         public Task InsertWors(IEnumerable<string> words) => _wordDao.AddSeveral(words);
         public Task<Word?> GetWordById(int id) => _wordDao.GetById(id);
         public Task<Word?> GetWordByWord(string word) => _wordDao.GetByWord(word);
+        public Task<IList<Word>> GetWordsByStrings(IList<string> words) => _wordDao.GetWordsByStrings(words);
 
         public Task InsertWordMessage(WordMessage wm) => _wordsMessagesDao.Add(wm);
         public Task InsertWordMessages(IEnumerable<WordMessage> wms) => _wordsMessagesDao.AddSeveral(wms);
         public Task<WordMessage?> GetWordMessageById(int id) => _wordsMessagesDao.GetById(id);
-        public Task<IEnumerable<WordMessage>> GetWmsForWord(int wordId) => _wordsMessagesDao.GetByWordId(wordId);
+        public Task<IList<WordMessage>> GetWmsForWord(int wordId) => _wordsMessagesDao.GetByWordId(wordId);
 
         public Task<IEnumerable<WordMessage>> GetWmsForMessage(long messageId) =>
             _wordsMessagesDao.GetByMessageId(messageId);

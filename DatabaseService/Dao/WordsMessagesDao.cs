@@ -80,7 +80,7 @@ namespace DatabaseService.Dao
             return result;
         }
 
-        public async Task<IEnumerable<WordMessage>> GetByWordId(int wordId)
+        public async Task<IList<WordMessage>> GetByWordId(int wordId)
         {
             var result = new List<WordMessage>();
             const string commandText = $"SELECT * FROM {TableName} WHERE message_id = @message_id";
