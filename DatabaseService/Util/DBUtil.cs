@@ -1,0 +1,36 @@
+﻿using System.Text;
+using Npgsql;
+using NpgsqlTypes;
+
+namespace DatabaseService.Util;
+
+public class DBUtil
+{
+    //Could be cached
+    public static NpgsqlParameter[] StringsToParams(IEnumerable<string> args, out string paramsString, string pTitle = "p")
+    {
+        var sb = new StringBuilder();
+        var parameters = new List<NpgsqlParameter>();
+        int i = 0;
+        foreach (var arg in args)
+        {
+            var pName = $"{pTitle}{i}";
+            var p = new NpgsqlParameter(pName, NpgsqlDbType.Varchar)
+            {
+                Value = arg
+            };
+            parameters.Add(p);
+
+            sb.Append(':');
+            sb.Append(pTitle);
+            sb.Append(", ");
+
+            i++;
+        }
+
+        sb[^2] = ' ';
+
+        paramsString = sb.ToString();
+        return parameters.ToArray();
+    }
+}

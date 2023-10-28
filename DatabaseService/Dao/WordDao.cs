@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using DatabaseService.Data;
+using DatabaseService.Util;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -75,24 +76,9 @@ namespace DatabaseService.Dao
 
         public async Task<IList<Word>> GetWordsByStrings(IList<string> words)
         {
-            const string commandTextTemplate = "SELECT * FROM words WHERE words.word IN (";
-            var sb = new StringBuilder(commandTextTemplate);
-            var parameters = new NpgsqlParameter[words.Count];
-
-            for (int i = 0; i < words.Count; ++i)
-            {
-                var pTitle = $"word{i}";
-                parameters[i] = new NpgsqlParameter(pTitle, NpgsqlDbType.Varchar);
-                parameters[i].Value = words[i];
-                sb.Append(':');
-                sb.Append(pTitle);
-                sb.Append(", ");
-            }
-
-            sb[^2] = ')';
-            var commandText = sb.ToString();
-            Console.WriteLine(commandText);
-
+            var parameters = DBUtil.StringsToParams(words, out var paramsString);
+            var commandText = $"SELECT * FROM words WHERE words.word IN ({paramsString})";
+            
             await using var cmd = new NpgsqlCommand(commandText, _connection);
             cmd.Parameters.AddRange(parameters);
             await using var reader = await cmd.ExecuteReaderAsync();

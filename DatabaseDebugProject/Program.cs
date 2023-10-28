@@ -18,6 +18,11 @@ foreach (var message in list)
     Console.WriteLine(message.Content);
 }
 
+var wordEntities = await service.GetWordsByStrings(words);
+foreach (var word in wordEntities)
+{
+    Console.WriteLine($"{word.Id} - {word.Text}");
+}
 
 var ts = DateTime.Now.Subtract(startTime);
 string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
