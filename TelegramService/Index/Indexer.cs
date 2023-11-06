@@ -15,8 +15,7 @@ public class Indexer
 
     public MessageIndex IndexMessage(Message message)
     {
-        var words = 0;
-        var tfIndex = IndexTf(message.Content, out words);
+        var tfIndex = IndexTf(message.Content, out var words);
 
         return new MessageIndex()
         {
@@ -30,17 +29,17 @@ public class Indexer
         //TODO: Optimize db operations
         var wms = new List<WordMessage>();
         var words = index.tfIndex.Keys;
-        await _service.InsertWors(words);
+        await _service.InsertWords(words);
+        var wordsEntities = await _service.GetWordsByStrings(words);
 
-        foreach (var word in words)
+        foreach (var wordEntity in wordsEntities)
         {
-            var wordEntity = await _service.GetWordByWord(word);
             wms.Add(new WordMessage
             {
                 Id = 0,
                 MessageId = messageId,
-                Count = index.tfIndex[word],
-                WordId = wordEntity!.Id
+                Count = index.tfIndex[wordEntity.Text],
+                WordId = wordEntity.Id
             });
         }
 
@@ -60,7 +59,7 @@ public class Indexer
             }
             else
             {
-                index[token] = 0;
+                index[token] = 1;
             }
         }
 

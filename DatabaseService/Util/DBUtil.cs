@@ -7,7 +7,8 @@ namespace DatabaseService.Util;
 public class DBUtil
 {
     //Could be cached
-    public static NpgsqlParameter[] StringsToParams(IEnumerable<string> args, out string paramsString, string pTitle = "p")
+    public static NpgsqlParameter[] StringsToParams(IEnumerable<string> args, out string paramsString,
+        string pTitle = "p")
     {
         var sb = new StringBuilder();
         var parameters = new List<NpgsqlParameter>();
@@ -22,13 +23,16 @@ public class DBUtil
             parameters.Add(p);
 
             sb.Append(':');
-            sb.Append(pTitle);
+            sb.Append(pName);
             sb.Append(", ");
 
             i++;
         }
 
-        sb[^2] = ' ';
+        if (sb.Length > 2)
+        {
+            sb.Remove(sb.Length - 2, 2);
+        }
 
         paramsString = sb.ToString();
         return parameters.ToArray();

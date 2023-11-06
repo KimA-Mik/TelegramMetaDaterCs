@@ -1,8 +1,6 @@
-﻿using System.Text;
-using DatabaseService.Data;
+﻿using DatabaseService.Data;
 using DatabaseService.Util;
 using Npgsql;
-using NpgsqlTypes;
 
 namespace DatabaseService.Dao
 {
@@ -25,21 +23,34 @@ namespace DatabaseService.Dao
             await cmd.ExecuteNonQueryAsync();
         }
 
-        public async Task AddSeveral(IEnumerable<string> words)
+        public async Task AddSeveral(IEnumerable<string> words, int depth = 0)
         {
-            var trans = await _connection.BeginTransactionAsync();
-            const string commandText = """
-                                       INSERT INTO words (word) VALUES (@word)
-                                       ON CONFLICT (word) DO NOTHING
-                                       """;
-            foreach (var word in words)
+            if (depth > 2)
             {
-                await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
-                cmd.Parameters.AddWithValue("word", word);
-                await cmd.ExecuteNonQueryAsync();
+                return;
             }
 
-            await trans.CommitAsync();
+            try
+            {
+                var trans = await _connection.BeginTransactionAsync();
+                const string commandText = """
+                                           INSERT INTO words (word) VALUES (@word)
+                                           ON CONFLICT (word) DO NOTHING
+                                           """;
+                foreach (var word in words)
+                {
+                    await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
+                    cmd.Parameters.AddWithValue("word", word);
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                await trans.CommitAsync();
+            }
+            catch (PostgresException e)
+            {
+                Console.WriteLine(e);
+                await AddSeveral(words, depth + 1);
+            }
         }
 
         public async Task<Word?> GetById(int id)
@@ -74,15 +85,21 @@ namespace DatabaseService.Dao
             return null;
         }
 
-        public async Task<IList<Word>> GetWordsByStrings(IList<string> words)
+        public async Task<IList<Word>> GetWordsByStrings(IEnumerable<string> words)
         {
+            var result = new List<Word>();
+
             var parameters = DBUtil.StringsToParams(words, out var paramsString);
-            var commandText = $"SELECT * FROM words WHERE words.word IN ({paramsString})";
-            
+            if (paramsString.Length < 3)
+            {
+                return result;
+            }
+
+            var commandText = $"SELECT * FROM words WHERE words.word IN ({paramsString});";
+
             await using var cmd = new NpgsqlCommand(commandText, _connection);
             cmd.Parameters.AddRange(parameters);
             await using var reader = await cmd.ExecuteReaderAsync();
-            var result = new List<Word>();
 
             while (await reader.ReadAsync())
             {

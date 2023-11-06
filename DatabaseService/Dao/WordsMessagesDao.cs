@@ -1,5 +1,7 @@
-﻿using DatabaseService.Data;
+﻿using System.Text;
+using DatabaseService.Data;
 using Npgsql;
+using NpgsqlTypes;
 
 namespace DatabaseService.Dao
 {
@@ -45,6 +47,32 @@ namespace DatabaseService.Dao
             }
 
             await trans.CommitAsync();
+        }
+
+        public async Task AddWordsForLastMessage(Dictionary<string, int> input)
+        {
+            var parameters = new NpgsqlParameter[input.Count * 2];
+            var sb = new StringBuilder();
+
+            var i = 0;
+            foreach (var (word, count) in input)
+            {
+                var wName = $"w{i}";
+                var cName = $"c{i}";
+                parameters[i * 2] = new NpgsqlParameter(wName, NpgsqlDbType.Varchar)
+                {
+                    Value = word
+                };
+                parameters[i * 2 + 1] = new NpgsqlParameter(cName, NpgsqlDbType.Integer)
+                {
+                    Value = count
+                };
+
+                sb.Append("@last_message_id, :");
+                sb.Append(wName);
+
+                i++;
+            }
         }
 
         public async Task<WordMessage?> GetById(int id)

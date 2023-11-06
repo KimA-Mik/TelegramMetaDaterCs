@@ -16,10 +16,12 @@ public class MessageDao
 
     public async Task Add(Message message)
     {
-        const string commandText =
-            $"INSERT INTO {TableName} (telegram_id, sender, content) VALUES (@telegram_id, @sender, @content)" +
-            "ON CONFLICT (telegram_id, sender) DO UPDATE\n" +
-            "SET content = excluded.content";
+        const string commandText = """
+                                   INSERT INTO messages (telegram_id, sender, content) VALUES (@telegram_id, @sender, @content)
+                                   ON CONFLICT (telegram_id, sender) DO UPDATE
+                                   SET content = excluded.content
+                                   """;
+
         await using var cmd = new NpgsqlCommand(commandText, _connection);
         cmd.Parameters.AddWithValue("telegram_id", message.TelegramId);
         cmd.Parameters.AddWithValue("sender", message.Sender);
@@ -107,6 +109,44 @@ public class MessageDao
         }
 
         return result;
+    }
+
+    public async Task<Message?> GetLastForSender(long senderId)
+    {
+        const string commandText = """
+                                   SELECT * FROM messages WHERE sender = :senderId
+                                   ORDER BY telegram_id DESC
+                                   LIMIT 1
+                                   """;
+
+        await using var cmd = new NpgsqlCommand(commandText, _connection);
+        cmd.Parameters.AddWithValue("senderId", senderId);
+        await using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            return ReadMessage(reader);
+        }
+
+        return null;
+    }
+
+    public async Task<Message?> GetFirstForSender(long senderId)
+    {
+        const string commandText = """
+                                   SELECT * FROM messages WHERE sender = :senderId
+                                   ORDER BY telegram_id ASC
+                                   LIMIT 1
+                                   """;
+
+        await using var cmd = new NpgsqlCommand(commandText, _connection);
+        cmd.Parameters.AddWithValue("senderId", senderId);
+        await using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            return ReadMessage(reader);
+        }
+
+        return null;
     }
 
     private static Message ReadMessage(NpgsqlDataReader reader)
