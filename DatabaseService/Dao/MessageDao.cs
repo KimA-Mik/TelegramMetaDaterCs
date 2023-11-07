@@ -17,7 +17,7 @@ public class MessageDao
     public async Task Add(Message message)
     {
         const string commandText = """
-                                   INSERT INTO messages (telegram_id, sender, content) VALUES (@telegram_id, @sender, @content)
+                                   INSERT INTO messages (telegram_id, sender, content, words_count) VALUES (@telegram_id, @sender, @content, @words_count)
                                    ON CONFLICT (telegram_id, sender) DO UPDATE
                                    SET content = excluded.content
                                    """;
@@ -26,6 +26,7 @@ public class MessageDao
         cmd.Parameters.AddWithValue("telegram_id", message.TelegramId);
         cmd.Parameters.AddWithValue("sender", message.Sender);
         cmd.Parameters.AddWithValue("content", message.Content);
+        cmd.Parameters.AddWithValue("words_count", message.Words);
 
         await cmd.ExecuteNonQueryAsync();
     }
@@ -34,7 +35,7 @@ public class MessageDao
     {
         var trans = await _connection.BeginTransactionAsync();
         const string commandText =
-            $"INSERT INTO {TableName} (telegram_id, sender, content) VALUES (@telegram_id, @sender, @content)" +
+            $"INSERT INTO {TableName} (telegram_id, sender, content, words_count) VALUES (@telegram_id, @sender, @content, @words_count)" +
             "ON CONFLICT (telegram_id, sender) DO UPDATE\n" +
             "SET content = excluded.content";
         foreach (var message in messages)
@@ -43,6 +44,7 @@ public class MessageDao
             cmd.Parameters.AddWithValue("telegram_id", message.TelegramId);
             cmd.Parameters.AddWithValue("sender", message.Sender);
             cmd.Parameters.AddWithValue("content", message.Content);
+            cmd.Parameters.AddWithValue("words_count", message.Words);
 
             await cmd.ExecuteNonQueryAsync();
         }
@@ -155,11 +157,13 @@ public class MessageDao
         var readSender = reader["sender"] as long?;
         var readContent = reader["content"] as string;
         var readTelegramId = reader["telegram_id"] as int?;
+        var readWordsCount = reader["words_count"] as int?;
 
         if (readId == null ||
             readSender == null ||
             readContent == null ||
-            readTelegramId == null)
+            readTelegramId == null ||
+            readWordsCount == null)
         {
             throw new Exception("Could not read message");
         }
@@ -170,6 +174,7 @@ public class MessageDao
             TelegramId = readTelegramId.Value,
             Sender = readSender.Value,
             Content = readContent,
+            Words = readWordsCount.Value
         };
         return message;
     }

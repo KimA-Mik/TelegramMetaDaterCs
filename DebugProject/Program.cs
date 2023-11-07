@@ -46,8 +46,16 @@ for (int i = 0; i < 2; i++)
         {
             while (telegramClient.TryGetMessage(out var message))
             {
+                var index = indexer.IndexMessage(message);
+                message.Words = index.wordsCount;
                 await innerService.InsertMessage(message);
-                await IndexMessage(indexer, message.Sender, message.TelegramId, innerService);
+
+                var dbMessage = await innerService.GetMessageBySenderAndTelegramId(message.Sender, message.TelegramId);
+                if (dbMessage == null)
+                {
+                    continue;
+                }
+                await indexer.LoadIndexIntoDb(dbMessage.Id, index);
             }
 
             await Task.Delay(5000);
@@ -57,16 +65,3 @@ for (int i = 0; i < 2; i++)
 
 await Task.WhenAll(tasks);
 task.Wait();
-
-//TODO: Extract indexing from client
-async Task IndexMessage(Indexer indexer, long sender, int telegramId, Service service)
-{
-    var message = await service.GetMessageBySenderAndTelegramId(sender, telegramId);
-    if (message == null)
-    {
-        return;
-    }
-
-    var index = indexer.IndexMessage(message);
-    await indexer.LoadIndexIntoDb(message.Id, index);
-}

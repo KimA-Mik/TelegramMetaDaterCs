@@ -23,34 +23,34 @@ namespace DatabaseService.Dao
             await cmd.ExecuteNonQueryAsync();
         }
 
-        public async Task AddSeveral(IEnumerable<string> words, int depth = 0)
+        // public async Task AddSeveral(IEnumerable<string> words, int depth = 0)
+        // {
+        //     var trans = await _connection.BeginTransactionAsync();
+        //     const string commandText = """
+        //                                INSERT INTO words (word) VALUES (@word)
+        //                                ON CONFLICT (word) DO NOTHING
+        //                                """;
+        //     foreach (var word in words)
+        //     {
+        //         await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
+        //         cmd.Parameters.AddWithValue("word", word);
+        //         await cmd.ExecuteNonQueryAsync();
+        //     }
+        //
+        //     await trans.CommitAsync();
+        // }
+
+        public async Task AddSeveral(IEnumerable<string> words)
         {
-            if (depth > 2)
-            {
-                return;
-            }
+            var parameters = DBUtil.StringsToValues(words, out var valuesString);
+            var commandText = $"""
+                               INSERT INTO words (word) VALUES {valuesString}
+                               ON CONFLICT (word) DO NOTHING;
+                               """;
 
-            try
-            {
-                var trans = await _connection.BeginTransactionAsync();
-                const string commandText = """
-                                           INSERT INTO words (word) VALUES (@word)
-                                           ON CONFLICT (word) DO NOTHING
-                                           """;
-                foreach (var word in words)
-                {
-                    await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
-                    cmd.Parameters.AddWithValue("word", word);
-                    await cmd.ExecuteNonQueryAsync();
-                }
-
-                await trans.CommitAsync();
-            }
-            catch (PostgresException e)
-            {
-                Console.WriteLine(e);
-                await AddSeveral(words, depth + 1);
-            }
+            var cmd = new NpgsqlCommand(commandText, _connection);
+            cmd.Parameters.AddRange(parameters);
+            await cmd.ExecuteNonQueryAsync();
         }
 
         public async Task<Word?> GetById(int id)

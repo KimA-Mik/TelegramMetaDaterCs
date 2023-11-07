@@ -19,8 +19,8 @@ namespace TelegremService
         private readonly ConcurrentQueue<Message> _outMessages = new();
         private readonly HashSet<long> excluded = new();
 
-        private Dictionary<long, User> _users = new();
-        private Dictionary<long, ChatBase> _chats = new();
+        private readonly Dictionary<long, User> _users = new();
+        private readonly Dictionary<long, ChatBase> _chats = new();
 
         public bool IsActive { get; private set; }
 
@@ -180,7 +180,9 @@ namespace TelegremService
                             Id = 0,
                             TelegramId = msg.id,
                             Sender = peer.ID,
-                            Content = msg.message
+                            Content = msg.message,
+                            //TODO: optimize word counting
+                            // Words = msg.message.Split(' ').Length
                         });
                     }
                 }

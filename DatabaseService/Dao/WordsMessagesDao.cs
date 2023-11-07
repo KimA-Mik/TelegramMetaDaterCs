@@ -29,24 +29,82 @@ namespace DatabaseService.Dao
             await cmd.ExecuteNonQueryAsync();
         }
 
+        // public async Task AddSeveral(IEnumerable<WordMessage> wms)
+        // {
+        //     var trans = await _connection.BeginTransactionAsync();
+        //     const string commandText =
+        //         $"INSERT INTO {TableName} (message_id, word_id, count) VALUES (@message_id, @word_id, @count)" +
+        //         "ON CONFLICT (message_id, word_id) DO UPDATE\n" +
+        //         "SET count = excluded.count";
+        //     foreach (var wm in wms)
+        //     {
+        //         await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
+        //         cmd.Parameters.AddWithValue("message_id", wm.MessageId);
+        //         cmd.Parameters.AddWithValue("word_id", wm.WordId);
+        //         cmd.Parameters.AddWithValue("count", wm.Count);
+        //
+        //         await cmd.ExecuteNonQueryAsync();
+        //     }
+        //
+        //     await trans.CommitAsync();
+        // }
+
         public async Task AddSeveral(IEnumerable<WordMessage> wms)
         {
-            var trans = await _connection.BeginTransactionAsync();
-            const string commandText =
-                $"INSERT INTO {TableName} (message_id, word_id, count) VALUES (@message_id, @word_id, @count)" +
-                "ON CONFLICT (message_id, word_id) DO UPDATE\n" +
-                "SET count = excluded.count";
-            foreach (var wm in wms)
-            {
-                await using var cmd = new NpgsqlCommand(commandText, _connection, trans);
-                cmd.Parameters.AddWithValue("message_id", wm.MessageId);
-                cmd.Parameters.AddWithValue("word_id", wm.WordId);
-                cmd.Parameters.AddWithValue("count", wm.Count);
+            var sb = new StringBuilder();
+            var parameters = new List<NpgsqlParameter>();
+            int i = 0;
 
-                await cmd.ExecuteNonQueryAsync();
+            foreach (var wordMessage in wms)
+            {
+                var mName = $"messageId{i}";
+                parameters.Add(new NpgsqlParameter(mName, NpgsqlDbType.Bigint)
+                {
+                    Value = wordMessage.MessageId
+                });
+                var wName = $"wordId{i}";
+                parameters.Add(new NpgsqlParameter(wName, NpgsqlDbType.Integer)
+                {
+                    Value = wordMessage.WordId
+                });
+                var cName = $"count{i}";
+                parameters.Add(new NpgsqlParameter(cName, NpgsqlDbType.Integer)
+                {
+                    Value = wordMessage.Count
+                });
+
+                sb.Append('(');
+                sb.Append(':');
+                sb.Append(mName);
+                sb.Append(", :");
+                sb.Append(wName);
+                sb.Append(", :");
+                sb.Append(cName);
+                sb.Append("), ");
+
+                i++;
             }
 
-            await trans.CommitAsync();
+
+            if (sb.Length > 2)
+            {
+                sb.Remove(sb.Length - 2, 2);
+            }
+
+            var valuesString = sb.ToString();
+
+            var commandText = $"""
+                               INSERT INTO words_messages (message_id, word_id, count)
+                               VALUES {valuesString}
+                               ON CONFLICT(message_id, word_id)
+                               DO UPDATE SET count = excluded.count
+                               """;
+
+
+            await using var cmd = new NpgsqlCommand(commandText, _connection);
+            cmd.Parameters.AddRange(parameters.ToArray());
+
+            await cmd.ExecuteNonQueryAsync();
         }
 
         public async Task AddWordsForLastMessage(Dictionary<string, int> input)
