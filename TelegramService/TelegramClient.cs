@@ -188,7 +188,7 @@ namespace TelegremService
                 }
 
                 offsetId = messages.Messages[^1].ID;
-                await Task.Delay(Random.Shared.Next(100, 2000));
+                await Task.Delay(Random.Shared.Next(100, 1100));
             }
         }
 

@@ -85,6 +85,11 @@ namespace DatabaseService.Dao
                 i++;
             }
 
+            if (i == 0)
+            {
+                return;
+            }
+
 
             if (sb.Length > 2)
             {

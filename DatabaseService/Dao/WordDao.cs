@@ -43,14 +43,28 @@ namespace DatabaseService.Dao
         public async Task AddSeveral(IEnumerable<string> words)
         {
             var parameters = DBUtil.StringsToValues(words, out var valuesString);
+            if (parameters.Length == 0)
+            {
+                return;
+            }
+
             var commandText = $"""
                                INSERT INTO words (word) VALUES {valuesString}
                                ON CONFLICT (word) DO NOTHING;
                                """;
+            try
+            {
 
-            var cmd = new NpgsqlCommand(commandText, _connection);
-            cmd.Parameters.AddRange(parameters);
-            await cmd.ExecuteNonQueryAsync();
+                var cmd = new NpgsqlCommand(commandText, _connection);
+                cmd.Parameters.AddRange(parameters);
+                await cmd.ExecuteNonQueryAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine(commandText);
+                throw ex;
+            }
         }
 
         public async Task<Word?> GetById(int id)

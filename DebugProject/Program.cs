@@ -36,12 +36,12 @@ var task = Task.Run(async () => await telegramClient.RunSth());
 
 var tasks = new List<Task>();
 
-for (int i = 0; i < 2; i++)
-{
-    tasks.Add(Task.Run(async () =>
-    {
-        using var innerService = new Service();
-        var indexer = new Indexer(innerService);
+//for (int i = 0; i < 1; i++)
+//{
+//    tasks.Add(Task.Run(async () =>
+//    {
+    using var innerService = new Service();
+    var indexer = new Indexer(innerService);
         while (telegramClient.IsActive)
         {
             while (telegramClient.TryGetMessage(out var message))
@@ -60,8 +60,8 @@ for (int i = 0; i < 2; i++)
 
             await Task.Delay(5000);
         }
-    }));
-}
+//    }));
+//}
 
 await Task.WhenAll(tasks);
 task.Wait();
