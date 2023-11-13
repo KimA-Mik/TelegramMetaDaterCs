@@ -5,11 +5,8 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>11</LangVersion>
     </PropertyGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\TelegramService\TelegramService.csproj" />
     </ItemGroup>
-
 </Project>

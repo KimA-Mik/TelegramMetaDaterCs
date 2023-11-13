@@ -27,6 +27,8 @@ namespace TelegramService
         public TelegramClient(string phoneNumber, string sessionName, Service? service = null)
         {
             _phoneNumber = phoneNumber;
+            //Sessions seems to need old method, idk 
+            //fix it later
             var sessionFileName = sessionName + ".session";
             var currentDirectory = Directory.GetCurrentDirectory();
             var sessionsDirectory = Path.Combine(currentDirectory, "sessions");

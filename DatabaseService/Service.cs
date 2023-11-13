@@ -37,8 +37,10 @@ namespace DatabaseService
         public Task InsertMessage(Message message) => _messageDao.Add(message);
         public Task InsertMessages(IEnumerable<Message> messages) => _messageDao.AddSeveral(messages);
         public Task<Message?> GetMessageById(long id) => _messageDao.GetById(id);
+        public Task<List<Message>> GetMessagesByIds(IEnumerable<long> ids) => _messageDao.GetByIds(ids);
         public Task<Message?> GetLastMessage(long senderId) => _messageDao.GetLastForSender(senderId);
         public Task<Message?> GetFirstMessage(long senderId) => _messageDao.GetFirstForSender(senderId);
+        public Task<long> GetMessagesCount() => _messageDao.GetCount();
 
         public Task<Message?> GetMessageBySenderAndTelegramId(long sender, int telegramId) =>
             _messageDao.GetBySenderAndTelegramId(sender, telegramId);
@@ -55,11 +57,14 @@ namespace DatabaseService
 
         public Task InsertWordMessage(WordMessage wm) => _wordsMessagesDao.Add(wm);
         public Task InsertWordMessages(IEnumerable<WordMessage> wms) => _wordsMessagesDao.AddSeveral(wms);
-        public Task<WordMessage?> GetWordMessageById(int id) => _wordsMessagesDao.GetById(id);
+        public Task<WordMessage?> GetWordMessageById(long id) => _wordsMessagesDao.GetById(id);
         public Task<IList<WordMessage>> GetWmsForWord(int wordId) => _wordsMessagesDao.GetByWordId(wordId);
 
         public Task<IEnumerable<WordMessage>> GetWmsForMessage(long messageId) =>
             _wordsMessagesDao.GetByMessageId(messageId);
+
+        public Task<List<WordMessage>> GetWmsForWord(string word) =>
+            _wordsMessagesDao.GetByWord(word);
 
 
         public void Dispose()

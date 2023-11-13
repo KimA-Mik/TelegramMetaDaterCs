@@ -6,10 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TelegramService\TelegramService.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="NLipsum" Version="1.1.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\TelegramService\TelegramService.csproj" />
+    </ItemGroup>
 </Project>

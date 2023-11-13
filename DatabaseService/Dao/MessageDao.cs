@@ -113,6 +113,29 @@ public class MessageDao
         return result;
     }
 
+    public async Task<List<Message>> GetByIds(IEnumerable<long> ids)
+    {
+        var result = new List<Message>();
+        var parameters = DBUtil.LongsToParams(ids, out var paramsString, "word");
+
+        if (parameters.Length == 0)
+        {
+            return result;
+        }
+
+        var commandText = $"SELECT * FROM messages WHERE Id IN ({paramsString})";
+        await using var cmd = new NpgsqlCommand(commandText, _connection);
+        cmd.Parameters.AddRange(parameters);
+        await using var reader = await cmd.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            result.Add(ReadMessage(reader));
+        }
+
+        return result;
+    }
+
     public async Task<Message?> GetLastForSender(long senderId)
     {
         const string commandText = """
@@ -136,7 +159,7 @@ public class MessageDao
     {
         const string commandText = """
                                    SELECT * FROM messages WHERE sender = :senderId
-                                   ORDER BY telegram_id ASC
+                                   ORDER BY telegram_id
                                    LIMIT 1
                                    """;
 
@@ -151,31 +174,41 @@ public class MessageDao
         return null;
     }
 
-    private static Message ReadMessage(NpgsqlDataReader reader)
+    public async Task<long> GetCount()
     {
-        var readId = reader["Id"] as int?;
-        var readSender = reader["sender"] as long?;
-        var readContent = reader["content"] as string;
-        var readTelegramId = reader["telegram_id"] as int?;
-        var readWordsCount = reader["words_count"] as int?;
-
-        if (readId == null ||
-            readSender == null ||
-            readContent == null ||
-            readTelegramId == null ||
-            readWordsCount == null)
+        const string commandText = "SELECT COUNT(*) FROM messages";
+        await using var cmd = new NpgsqlCommand(commandText, _connection);
+        await using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
         {
-            throw new Exception("Could not read message");
+            if (reader["count"] is long count)
+            {
+                return count;
+            }
         }
 
-        var message = new Message()
+        return 0;
+    }
+
+    private static Message ReadMessage(NpgsqlDataReader reader)
+    {
+        if (reader["words_count"] is int wordsCount &&
+            reader["telegram_id"] is int telegramId &&
+            reader["content"] is string content &&
+            reader["sender"] is long sender &&
+            reader["Id"] is long id
+           )
         {
-            Id = readId.Value,
-            TelegramId = readTelegramId.Value,
-            Sender = readSender.Value,
-            Content = readContent,
-            Words = readWordsCount.Value
-        };
-        return message;
+            return new Message()
+            {
+                Id = id,
+                Sender = sender,
+                Content = content,
+                TelegramId = telegramId,
+                Words = wordsCount
+            };
+        }
+
+        throw new Exception("Could not read message");
     }
 }

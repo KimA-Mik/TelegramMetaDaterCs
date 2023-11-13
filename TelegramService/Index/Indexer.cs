@@ -8,9 +8,9 @@ public class Indexer
     private readonly Lexer _lexer = new Lexer();
     private readonly Service _service;
 
-    public Indexer(Service service)
+    public Indexer(Service? service = null)
     {
-        _service = service;
+        _service = service ?? new Service();
     }
 
     public MessageIndex IndexMessage(Message message)
@@ -24,7 +24,7 @@ public class Indexer
         };
     }
 
-    public async Task LoadIndexIntoDb(int messageId, MessageIndex index)
+    public async Task LoadIndexIntoDb(long messageId, MessageIndex index)
     {
         //TODO: Optimize db operations
         var wms = new List<WordMessage>();
@@ -34,12 +34,14 @@ public class Indexer
 
         foreach (var wordEntity in wordsEntities)
         {
+            var count = index.tfIndex[wordEntity.Text];
             wms.Add(new WordMessage
             {
                 Id = 0,
                 MessageId = messageId,
-                Count = index.tfIndex[wordEntity.Text],
-                WordId = wordEntity.Id
+                Count = count,
+                WordId = wordEntity.Id,
+                TermFrequency = (float)count / index.wordsCount
             });
         }
 
@@ -48,6 +50,8 @@ public class Indexer
 
     private Dictionary<string, int> IndexTf(string text, out int wordsCount)
     {
+        var startTime = DateTime.Now;
+
         wordsCount = 0;
         var index = new Dictionary<string, int>();
         foreach (var token in _lexer.Tokenize(text))

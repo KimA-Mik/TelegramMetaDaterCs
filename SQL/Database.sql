@@ -12,7 +12,7 @@ CREATE TABLE Supergroups
 
 CREATE TABLE Messages
 (
-    id          SERIAL PRIMARY KEY,
+    id          BIGSERIAL PRIMARY KEY,
     telegram_id INT,
     sender      BIGINT REFERENCES Supergroups (id),
     content     TEXT,
@@ -30,10 +30,11 @@ CREATE UNIQUE INDEX Words_Word ON Words (Word);
 
 CREATE TABLE Words_Messages
 (
-    id         SERIAL PRIMARY KEY,
-    message_id BIGINT REFERENCES Messages (id),
-    word_id    INT REFERENCES Words (id),
-    count      INT
+    id             BIGSERIAL PRIMARY KEY,
+    message_id     BIGINT REFERENCES Messages (id),
+    word_id        INT REFERENCES Words (id),
+    count          INT,
+    term_frequency REAL
 );
 CREATE INDEX WordMessages_WordId ON Words_Messages (word_id);
 CREATE UNIQUE INDEX WordMessages_WordId_MessageId ON Words_Messages (Message_Id, word_id);

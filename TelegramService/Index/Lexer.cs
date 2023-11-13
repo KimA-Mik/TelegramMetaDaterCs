@@ -7,6 +7,7 @@
             text = text.ToLower();
             for (var i = 0; i < text.Length; ++i)
             {
+                //TODO: hashtag support
                 if (!Char.IsLetter(text[i])) continue;
                 var start = i++;
                 while (i < text.Length &&

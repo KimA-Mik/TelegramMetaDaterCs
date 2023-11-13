@@ -17,14 +17,16 @@ namespace DatabaseService.Dao
 
         public async Task Add(WordMessage wm)
         {
-            const string commandText =
-                $"INSERT INTO {TableName} (message_id, word_id, count) VALUES (@message_id, @word_id, @count)" +
-                "ON CONFLICT (message_id, word_id) DO UPDATE\n" +
-                "SET count = excluded.count";
+            const string commandText = """
+                                       INSERT INTO Words_Messages (message_id, word_id, count, term_frequency) VALUES (@message_id, @word_id, @count, @term_frequency)
+                                       ON CONFLICT (message_id, word_id) DO UPDATE
+                                       SET count = excluded.count
+                                       """;
             await using var cmd = new NpgsqlCommand(commandText, _connection);
             cmd.Parameters.AddWithValue("message_id", wm.MessageId);
             cmd.Parameters.AddWithValue("word_id", wm.WordId);
             cmd.Parameters.AddWithValue("count", wm.Count);
+            cmd.Parameters.AddWithValue("term_frequency", wm.TermFrequency);
 
             await cmd.ExecuteNonQueryAsync();
         }
@@ -72,6 +74,11 @@ namespace DatabaseService.Dao
                 {
                     Value = wordMessage.Count
                 });
+                var tfName = $"tf{i}";
+                parameters.Add(new NpgsqlParameter(tfName, NpgsqlDbType.Real)
+                {
+                    Value = wordMessage.TermFrequency
+                });
 
                 sb.Append('(');
                 sb.Append(':');
@@ -80,6 +87,8 @@ namespace DatabaseService.Dao
                 sb.Append(wName);
                 sb.Append(", :");
                 sb.Append(cName);
+                sb.Append(", :");
+                sb.Append(tfName);
                 sb.Append("), ");
 
                 i++;
@@ -99,7 +108,7 @@ namespace DatabaseService.Dao
             var valuesString = sb.ToString();
 
             var commandText = $"""
-                               INSERT INTO words_messages (message_id, word_id, count)
+                               INSERT INTO words_messages (message_id, word_id, count, term_frequency)
                                VALUES {valuesString}
                                ON CONFLICT(message_id, word_id)
                                DO UPDATE SET count = excluded.count
@@ -138,7 +147,7 @@ namespace DatabaseService.Dao
             }
         }
 
-        public async Task<WordMessage?> GetById(int id)
+        public async Task<WordMessage?> GetById(long id)
         {
             const string commandText = $"SELECT * FROM {TableName} WHERE Id = @id";
             await using var cmd = new NpgsqlCommand(commandText, _connection);
@@ -188,29 +197,51 @@ namespace DatabaseService.Dao
             return result;
         }
 
+        public async Task<List<WordMessage>> GetByWord(string word)
+        {
+            var result = new List<WordMessage>();
+            //const string commandText = $"SELECT * FROM {TableName} WHERE message_id = @message_id";
+            const string commandText = """
+                                       SELECT * FROM words_messages WHERE word_id in (
+                                           SELECT id FROM words WHERE word = @word
+                                       )
+                                       """;
+
+
+            await using var cmd = new NpgsqlCommand(commandText, _connection);
+            cmd.Parameters.AddWithValue("word", word);
+            await using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                result.Add(ReadWordMessage(reader));
+            }
+
+            return result;
+        }
+
         private static WordMessage ReadWordMessage(NpgsqlDataReader reader)
         {
-            var readId = reader["Id"] as int?;
-            var readMessageId = reader["message_id"] as long?;
-            var readWordId = reader["word_id"] as int?;
-            var readCount = reader["count"] as int?;
-
-            if (readId == null ||
-                readCount == null ||
-                readWordId == null ||
-                readMessageId == null)
+            if (reader["term_frequency"] is float termFrequency &&
+                reader["message_id"] is long messageId &&
+                reader["word_id"] is int wordId &&
+                reader["count"] is int count &&
+                reader["Id"] is long id
+               )
+            {
+                return new WordMessage()
+                {
+                    Id = id,
+                    MessageId = messageId,
+                    WordId = wordId,
+                    Count = count,
+                    TermFrequency = termFrequency
+                };
+            }
+            else
             {
                 throw new Exception("Could not read WordMessage");
             }
-
-            var message = new WordMessage()
-            {
-                Id = readId.Value,
-                MessageId = readMessageId.Value,
-                WordId = readWordId.Value,
-                Count = readCount.Value
-            };
-            return message;
         }
     }
 }
