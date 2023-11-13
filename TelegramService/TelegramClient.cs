@@ -2,12 +2,12 @@
 using System.Diagnostics.CodeAnalysis;
 using DatabaseService;
 using DatabaseService.Data;
-using TelegremService.Index;
+using TelegramService.Index;
 using TL;
 using WTelegram;
 using Message = DatabaseService.Data.Message;
 
-namespace TelegremService
+namespace TelegramService
 {
     public class TelegramClient : IDisposable
     {

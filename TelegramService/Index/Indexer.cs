@@ -1,7 +1,7 @@
 ﻿using DatabaseService;
 using DatabaseService.Data;
 
-namespace TelegremService.Index;
+namespace TelegramService.Index;
 
 public class Indexer
 {

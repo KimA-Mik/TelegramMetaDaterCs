@@ -1,4 +1,4 @@
-﻿namespace TelegremService;
+﻿namespace TelegramService.Index;
 
 public class MessageIndex
 {

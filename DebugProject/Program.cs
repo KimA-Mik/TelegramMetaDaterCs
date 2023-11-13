@@ -1,6 +1,6 @@
 ﻿using DatabaseService;
-using TelegremService;
-using TelegremService.Index;
+using TelegramService;
+using TelegramService.Index;
 
 
 //using var client = new WTelegram.Client(Config);
