@@ -1,0 +1,97 @@
+﻿@page "/"
+@using DatabaseService
+@using DatabaseService.Data
+@using TelegramService
+@inject Service _service
+
+<PageTitle>Main</PageTitle>
+
+<h1>Meta Dater</h1>
+
+@* <input type="search" value="@query" @onsubmit="@OnSubmit" @onchange="@OnChange" style="width:500px"/> *@
+
+@* <InputText @onsubmit="@OnSubmit" @onchange="@OnChange" @bind-Value="query"/> *@
+
+
+<EditForm EditContext="@editContext" OnSubmit="@OnSubmit" FormName="searchQuery">
+    <DataAnnotationsValidator/>
+    <div>
+        <label>
+            query:
+            <InputText @bind-Value="query"/>
+        </label>
+    </div>
+    <div>
+        <button type="submit">Search</button>
+    </div>
+</EditForm>
+
+@if (results != null)
+{
+    foreach (var result in results)
+    {
+        <div>
+            <h5 >
+                @if (channels.ContainsKey(result.Sender))
+                {
+                    <a target="_blank" href="https://t.me/@channels[result.Sender].MainUsername/@result.TelegramId">
+                        @channels[@result.Sender].Title
+                    </a>
+                }
+                else
+                {
+                    @result.Sender
+                }
+            </h5>
+            <p>@result.Content</p>
+        </div>
+    }
+}
+
+
+@code {
+    private Dictionary<long, Supergroup> channels;
+    private Searcher _searcher;
+    private EditContext? editContext;
+    private List<Message>? results;
+    [SupplyParameterFromForm] public string query { get; set; } = String.Empty;
+
+    protected override void OnInitialized()
+    {
+        _searcher = new Searcher(_service);
+        editContext = new EditContext(query);
+        channels = new Dictionary<long, Supergroup>();
+    }
+
+
+    void OnChange()
+    {
+        Console.WriteLine(query);
+    }
+
+    async Task OnSubmit()
+    {
+        if (query.Length == 0)
+        {
+            Console.WriteLine("empty");
+        }
+        else
+        {
+            results = await _searcher.Search(query.Trim());
+            Console.WriteLine(query);
+            foreach (var message in results)
+            {
+                Console.WriteLine(message.Content);
+                if (!channels.ContainsKey(message.Sender))
+                {
+                    var chat = await _service.GetSupergroupById(message.Sender);
+                    if (chat != null)
+                    {
+                        channels[message.Sender] = chat;
+                    }
+                }
+            }
+        }
+    }
+
+}

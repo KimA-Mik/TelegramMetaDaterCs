@@ -16,9 +16,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIndexer", "SimpleInde
 		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542} = {C2C3A7E2-E7E8-46CD-91C9-A1F696366542}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSearcher", "SimpleSearcher\SimpleSearcher.csproj", "{D26602B1-8D04-42C0-AC1A-905D970F02AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSearcher", "SimpleSearcher\SimpleSearcher.csproj", "{D26602B1-8D04-42C0-AC1A-905D970F02AB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{AF522835-57F8-49E2-A1A3-790D3CE90E06} = {AF522835-57F8-49E2-A1A3-790D3CE90E06}
+		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542} = {C2C3A7E2-E7E8-46CD-91C9-A1F696366542}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetaDater", "MetaDater\MetaDater.csproj", "{3E938340-9A47-4CDC-83F8-CAE4534CE61B}"
+	ProjectSection(ProjectDependencies) = postProject
 		{C2C3A7E2-E7E8-46CD-91C9-A1F696366542} = {C2C3A7E2-E7E8-46CD-91C9-A1F696366542}
 	EndProjectSection
 EndProject
@@ -44,6 +49,10 @@ Global
 		{D26602B1-8D04-42C0-AC1A-905D970F02AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D26602B1-8D04-42C0-AC1A-905D970F02AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D26602B1-8D04-42C0-AC1A-905D970F02AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E938340-9A47-4CDC-83F8-CAE4534CE61B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E938340-9A47-4CDC-83F8-CAE4534CE61B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E938340-9A47-4CDC-83F8-CAE4534CE61B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E938340-9A47-4CDC-83F8-CAE4534CE61B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

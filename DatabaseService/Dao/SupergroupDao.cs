@@ -66,7 +66,7 @@ namespace DatabaseService.Dao
         {
             var readId = reader["Id"] as long?;
             var readTitle = reader["Title"] as string;
-            var readMainUsername = reader["MainUsername"] as string;
+            var readMainUsername = reader["Main_Username"] as string;
 
             if (readId == null ||
                 readTitle == null ||
