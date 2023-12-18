@@ -13,16 +13,14 @@
 @* <InputText @onsubmit="@OnSubmit" @onchange="@OnChange" @bind-Value="query"/> *@
 
 
-<EditForm EditContext="@editContext" OnSubmit="@OnSubmit" FormName="searchQuery">
+<EditForm EditContext="@editContext" OnSubmit="@OnSubmit" FormName="searchQuery" style="padding-bottom: 32px">
     <DataAnnotationsValidator/>
     <div>
         <label>
             query:
             <InputText @bind-Value="query"/>
+            <button type="submit">Search</button>
         </label>
-    </div>
-    <div>
-        <button type="submit">Search</button>
     </div>
 </EditForm>
 
